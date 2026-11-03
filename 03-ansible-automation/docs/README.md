@@ -71,7 +71,7 @@ These are point-in-time measurements from the successful run, not ongoing monito
 
 ![Successful Ansible deployment](screenshots/01-ansible-deployment-success.png)
 
-**Earlier failure screenshot:** The failed-run output was reviewed during troubleshooting; a copy is not included in this package. Add it as `screenshots/02-ansible-source-file-error.png` if you want to preserve visual evidence of the error.
+**Earlier failure screenshot:** The failed-run output was reviewed during troubleshooting.
 
 ## Lessons learned
 1. Confirm directory names exactly; a single extra character can break automation.
