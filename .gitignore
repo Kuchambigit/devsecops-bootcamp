@@ -1,1 +1,13 @@
 01-linux-fundamentals/permission-lab/app-config.txt
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python-generated cache files
+__pycache__/
+*.pyc
+
+# Local environment variables and secrets
+.env
+.env.*

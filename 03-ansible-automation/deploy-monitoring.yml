@@ -1,0 +1,32 @@
+
+# Deploy the Python monitoring script to our Ubuntu server
+- name: Deploy Python Server Monitoring
+  hosts: devops_servers
+  become: false
+
+  tasks:
+    # Create a directory for the deployed monitoring application
+    - name: Create monitoring directory
+      ansible.builtin.file:
+        path: /home/katud/server-monitoring
+        state: directory
+        mode: '0755'
+
+    # Copy the monitoring script to the deployment directory
+    - name: Deploy health check script
+      ansible.builtin.copy:
+        src: /home/katud/devsecops-bootcamp/02-python-automation/server-monitoring/health_check.py 
+        dest: /home/katud/server-monitoring/health_check.py
+        mode: '0644'
+
+    # Execute the deployed monitoring script
+    - name: Run server health check
+      ansible.builtin.command:
+        cmd: /home/katud/devsecops-bootcamp/02-python-automation/server-monitoring/.venv/bin/python /home/katud/server-monitoring/health_check.py
+      register: health_result
+      changed_when: false
+
+    # Display the monitoring results
+    - name: Display server health results
+      ansible.builtin.debug:
+        var: health_result.stdout_lines
