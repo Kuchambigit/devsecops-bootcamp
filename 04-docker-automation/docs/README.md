@@ -239,3 +239,63 @@ Status: Completed Successfully
 
 ### 5. README Documentation
 ![README Documentation](screenshots/Screenshot-05-readme-documentation.png)
+
+
+Module 05 — Container Vulnerability Scanning and Remediation
+
+Date: November 7, 2026
+Security Tool: Trivy v0.76.2
+Environment: Ubuntu VM hosted on Proxmox
+Container Image: devsecops-webapp
+Objective
+
+Identify and remediate known vulnerabilities in the Docker container image using Trivy.
+Initial Security Assessment
+
+The initial scan of devsecops-webapp:v1, based on Alpine Linux 3.24.3, identified 54 vulnerabilities.
+Severity	Initial Scan (V1)	Remediated Image (V2)
+Critical	1	0
+High	6	0
+Medium	3	1
+Low	44	0
+Total	54	1
+Remediation Performed
+
+    Updated the NGINX Alpine base image by rebuilding with the --pull option.
+
+    Built a new image tagged devsecops-webapp:v2.
+
+    Scanned the updated image using Trivy.
+
+    Verified that the number of detected vulnerabilities decreased from 54 to 1.
+
+Result: Approximately 98% reduction in detected vulnerabilities.
+Remaining Security Finding
+
+    CVE: CVE-2026-4738
+
+    Affected package: zlib
+
+    Severity: Medium
+
+    Installed version: 1.3.2-r1
+
+    Fixed version: 1.4-r0
+
+    Status: Pending remediation.
+
+Security Evidence
+
+The vulnerability scan report is stored at:
+
+docs/security-reports/trivy-v2.json
+Lessons Learned
+
+This exercise demonstrated the importance of regularly updating container base images, scanning Docker images for vulnerabilities, validating remediation results, and documenting remaining security risks.
+Next Steps
+
+    Investigate remediation options for the remaining vulnerability.
+
+    Integrate Trivy scanning into the CI/CD pipeline.
+
+    Establish vulnerability severity thresholds for deployment decisions.
