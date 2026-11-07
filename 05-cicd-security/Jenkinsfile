@@ -21,8 +21,9 @@ pipeline {
 
         stage('Security Validation') {
             steps {
-                // Initial security validation placeholder
-                echo 'Security validation stage initialized'
+                // Scan the existing Docker image for HIGH and CRITICAL vulnerabilities.
+               // Exit code 1 makes Jenkins fail when matching vulnerabilities are found.
+               sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 --scanners vuln devsecops-webapp:v1'
             }
         }
     }
