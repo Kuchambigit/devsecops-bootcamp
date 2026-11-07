@@ -1,0 +1,29 @@
+// Declarative Jenkins pipeline
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Retrieve source code from the configured Git repository
+                checkout scm
+            }
+        }
+
+        stage('Environment Check') {
+            steps {
+                // Confirm the Jenkins build environment
+                sh 'whoami'
+                sh 'pwd'
+                sh 'git --version'
+            }
+        }
+
+        stage('Security Validation') {
+            steps {
+                // Initial security validation placeholder
+                echo 'Security validation stage initialized'
+            }
+        }
+    }
+}
