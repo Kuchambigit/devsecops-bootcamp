@@ -1,0 +1,35 @@
+# Workflow name displayed in GitHub Actions
+name: Docker Security Scan
+
+# Run automatically when changes are pushed to main
+on:
+  push:
+    branches:
+      - main
+
+  # Allow manual execution from GitHub
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    # Use a GitHub-hosted Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download our repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Build our Docker image
+      - name: Build Docker Image
+        run: docker build --pull -t devsecops-webapp:ci ./04-docker-automation/webapp
+
+      # Step 3: Scan the image for vulnerabilities
+      - name: Trivy Security Scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: devsecops-webapp:ci
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          scanners: vuln
