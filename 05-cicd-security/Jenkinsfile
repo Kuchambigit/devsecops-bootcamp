@@ -1,30 +1,54 @@
-// Declarative Jenkins pipeline
+// DevSecOps Jenkins CI/CD Pipeline
+// Purpose: Checkout code, build a Docker image, and scan for vulnerabilities.
+
 pipeline {
     agent any
 
     stages {
+
+        // Stage 1: Retrieve source code from GitHub
         stage('Checkout') {
             steps {
-                // Retrieve source code from the configured Git repository
                 checkout scm
             }
         }
 
+        // Stage 2: Verify the Jenkins build environment
         stage('Environment Check') {
             steps {
-                // Confirm the Jenkins build environment
                 sh 'whoami'
                 sh 'pwd'
                 sh 'git --version'
+                sh 'docker --version'
+                sh 'trivy --version'
             }
         }
 
+        // Stage 3: Build a fresh Docker image
+        stage('Docker Build') {
+            steps {
+                // Build the image using the application's Dockerfile
+                sh 'docker build --pull -t devsecops-webapp:ci ./04-docker-automation/webapp'
+            }
+        }
+
+        // Stage 4: Scan the newly built Docker image
         stage('Security Validation') {
             steps {
-                // Scan the existing Docker image for HIGH and CRITICAL vulnerabilities.
-               // Exit code 1 makes Jenkins fail when matching vulnerabilities are found.
-               sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 --scanners vuln devsecops-webapp:v1'
+                // Scan for HIGH and CRITICAL vulnerabilities
+                // Exit code 1 fails the pipeline if vulnerabilities are detected
+                sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 --scanners vuln devsecops-webapp:ci'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'SUCCESS: Docker image built and passed Trivy security scanning.'
+        }
+
+        failure {
+            echo 'FAILED: Check the Jenkins console output for errors or vulnerabilities.'
         }
     }
 }
