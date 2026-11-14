@@ -26,7 +26,9 @@ jobs:
 
       # Step 3: Scan the image for vulnerabilities
       - name: Trivy Security Scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@master
+
+
         with:
           image-ref: devsecops-webapp:ci
           format: table
