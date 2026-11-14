@@ -82,3 +82,99 @@ Goal
 
 Develop practical DevSecOps engineering skills through repeatable hands-on labs, security automation, CI/CD implementation, Kubernetes deployments, and continuous monitoring.
 
+## Module 04: Docker Security Remediation
+
+### Objective
+Identify and remediate security vulnerabilities in a Dockerized NGINX application using SonarQube Cloud and Docker security best practices.
+
+### 1. Security Finding
+
+**Tool:** SonarQube Cloud  
+**File:** `04-docker-automation/webapp/Dockerfile`  
+**Finding:** NGINX container runs as the root user by default.  
+**Severity:** Low
+
+**Security Risk:** Running containers as root increases the potential impact of a container compromise.
+
+### 2. Security Remediation
+
+Replaced the original NGINX base image with an unprivileged version.
+
+**Original image:**
+`nginx:alpine`
+
+**Secured image:**
+`nginxinc/nginx-unprivileged:stable-alpine`
+
+Additional changes:
+- Removed the package upgrade command that required elevated permissions.
+- Changed the exposed container port from 80 to 8080.
+- Retained the custom HTML application.
+
+### 3. Docker Image Build
+
+Built the secured image using:
+
+```bash
+# Build the secured NGINX Docker image
+docker build -t devsecops-webapp:secure ./04-docker-automation/webapp
+```
+
+**Result:** Docker image built successfully.
+
+### 4. Verify Non-Root Execution
+
+```bash
+# Check the user identity inside the secured container
+docker run --rm devsecops-webapp:secure id
+```
+
+**Verification output:**
+
+```text
+uid=101(nginx) gid=101(nginx) groups=101(nginx),101(nginx)
+```
+
+**Result:** Confirmed that NGINX runs as a non-root user.
+
+### 5. Application Functionality Testing
+
+The existing application was using port 8080, while Jenkins was using port 8081.
+
+To avoid disrupting existing services, the secured container was deployed using host port 8082.
+
+```bash
+# Start the secured application on host port 8082
+docker run -d \
+  --name devsecops-secure-webapp \
+  -p 8082:8080 \
+  devsecops-webapp:secure
+
+# Verify the secured application responds
+curl http://localhost:8082
+```
+
+**Result:** The application successfully returned the DevSecOps Bootcamp HTML page.
+
+### 6. SonarQube Security Verification
+
+After committing and pushing the remediation to GitHub, SonarQube Cloud completed another analysis.
+
+**Results:**
+- Open issues: 0
+- Top-priority issues: 0
+- Dockerfile security finding: Resolved
+
+### 7. Key Lessons Learned
+
+- Containers should run with the minimum privileges necessary.
+- Docker base images influence the security of containerized applications.
+- Security changes should be validated through functional testing.
+- Port conflicts can be resolved without interrupting existing services.
+- Automated static analysis helps identify and track security weaknesses.
+
+### Final Outcome
+
+**Module 04 Docker Security Remediation: Completed Successfully.**
+
+The application now runs using an unprivileged NGINX image, and its functionality has been verified.
