@@ -10,14 +10,14 @@
       ansible.builtin.file:
         path: /home/katud/server-monitoring
         state: directory
-        mode: '0755'
+        mode: '0750'
 
     # Copy the monitoring script to the deployment directory
     - name: Deploy health check script
       ansible.builtin.copy:
         src: /home/katud/devsecops-bootcamp/02-python-automation/server-monitoring/health_check.py 
         dest: /home/katud/server-monitoring/health_check.py
-        mode: '0644'
+        mode: '0640'
 
     # Execute the deployed monitoring script
     - name: Run server health check
