@@ -26,7 +26,7 @@ jobs:
 
       # Step 3: Scan the image for vulnerabilities
       - name: Trivy Security Scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
 
 
         with:
