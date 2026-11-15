@@ -1,5 +1,6 @@
 // DevSecOps Jenkins CI/CD Pipeline
-// Purpose: Checkout code, build a Docker image, and scan for vulnerabilities.
+// Purpose: Checkout source code, analyze code quality,
+// build a Docker image, and scan for vulnerabilities.
 
 pipeline {
     agent any
@@ -24,19 +25,41 @@ pipeline {
             }
         }
 
-        // Stage 3: Build a fresh Docker image
+        // Stage 3: Analyze source code using SonarQube Cloud
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Locate the scanner configured in Jenkins Tools
+                    def scannerHome = tool 'SonarQubeScanner'
+
+                    // Load SonarQube server settings and authentication
+                    withSonarQubeEnv('SonarQubeCloud') {
+
+                        // Run source code analysis
+                        sh """
+                            "${scannerHome}/bin/sonar-scanner" \\
+                            -Dsonar.projectKey=Kuchambigit_devsecops-bootcamp \\
+                            -Dsonar.organization=kuchambigit \\
+                            -Dsonar.sources=. \\
+                            -Dsonar.host.url=https://sonarcloud.io
+                        """
+                    }
+                }
+            }
+        }
+
+        // Stage 4: Build the Docker application image
         stage('Docker Build') {
             steps {
-                // Build the image using the application's Dockerfile
+                // Build the image using the existing Dockerfile
                 sh 'docker build --pull -t devsecops-webapp:ci ./04-docker-automation/webapp'
             }
         }
 
-        // Stage 4: Scan the newly built Docker image
+        // Stage 5: Scan the Docker image for vulnerabilities
         stage('Security Validation') {
             steps {
-                // Scan for HIGH and CRITICAL vulnerabilities
-                // Exit code 1 fails the pipeline if vulnerabilities are detected
+                // Fail the pipeline if HIGH or CRITICAL vulnerabilities are found
                 sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 --scanners vuln devsecops-webapp:ci'
             }
         }
@@ -44,11 +67,13 @@ pipeline {
 
     post {
         success {
-            echo 'SUCCESS: Docker image built and passed Trivy security scanning.'
+            // Display a message when every stage succeeds
+            echo 'SUCCESS: SonarQube analysis, Docker build, and Trivy security scanning completed.'
         }
 
         failure {
-            echo 'FAILED: Check the Jenkins console output for errors or vulnerabilities.'
+            // Display a message if any stage fails
+            echo 'FAILED: Check the Jenkins console output for errors.'
         }
     }
 }
